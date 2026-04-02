@@ -24,10 +24,12 @@ export function useCampuses() {
 
 export function useDepartments(campusId?: string) {
   const { activeEnvId, isAuth } = useAuth()
-  const qs = campusId ? `?campusId=${campusId}` : ''
+  const params = new URLSearchParams()
+  if (campusId) params.set('campusId', campusId)
+  const qs = params.toString()
   return useQuery<FilterOption[]>({
     queryKey: ['admin-filters', 'departments', activeEnvId, campusId],
-    queryFn: () => apiClient<FilterOption[]>(`/admin/filters/departments${qs}`),
+    queryFn: () => apiClient<FilterOption[]>(`/admin/filters/departments${qs ? `?${qs}` : ''}`),
     enabled: !!activeEnvId && isAuth,
     staleTime: 5 * 60_000,
   })
@@ -35,10 +37,12 @@ export function useDepartments(campusId?: string) {
 
 export function usePrograms(departmentId?: string) {
   const { activeEnvId, isAuth } = useAuth()
-  const qs = departmentId ? `?departmentId=${departmentId}` : ''
+  const params = new URLSearchParams()
+  if (departmentId) params.set('departmentId', departmentId)
+  const qs = params.toString()
   return useQuery<FilterOption[]>({
     queryKey: ['admin-filters', 'programs', activeEnvId, departmentId],
-    queryFn: () => apiClient<FilterOption[]>(`/admin/filters/programs${qs}`),
+    queryFn: () => apiClient<FilterOption[]>(`/admin/filters/programs${qs ? `?${qs}` : ''}`),
     enabled: !!activeEnvId && isAuth,
     staleTime: 5 * 60_000,
   })

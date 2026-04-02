@@ -26,8 +26,20 @@ export function AppShell() {
   )
   const clearSession = useAuthStore((s) => s.clearSession)
 
-  const handleLogout = () => {
-    if (activeEnvId) clearSession(activeEnvId)
+  const handleLogout = async () => {
+    if (activeEnvId) {
+      // Attempt server-side token invalidation before clearing client state
+      const env = useEnvStore.getState().environments.find((e) => e.id === activeEnvId)
+      const token = useAuthStore.getState().getToken(activeEnvId)
+      if (env && token) {
+        const url = `${env.baseUrl.replace(/\/$/, '')}/api/v1/auth/logout`
+        fetch(url, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        }).catch(() => {})  // Best-effort — don't block logout on network failure
+      }
+      clearSession(activeEnvId)
+    }
     navigate('/login')
   }
 

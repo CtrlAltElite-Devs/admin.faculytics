@@ -71,7 +71,7 @@ export function RoleActionDialog({
 
   const handleAssign = () => {
     const catId = Number(assignCategoryId)
-    if (!catId) return
+    if (!Number.isInteger(catId) || catId <= 0) return
     assignRole.mutate(
       {
         userId: user.id,
@@ -90,7 +90,7 @@ export function RoleActionDialog({
   const handleRemove = () => {
     if (!confirmRemove) return
     const catId = Number(removeCategoryId)
-    if (!catId) return
+    if (!Number.isInteger(catId) || catId <= 0) return
     removeRole.mutate(
       {
         userId: user.id,

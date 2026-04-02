@@ -60,6 +60,18 @@ export function SettingsPage() {
   const handleSave = () => {
     if (!form.label.trim() || !form.baseUrl.trim()) return
 
+    // Validate URL protocol — only allow http(s) to prevent javascript: / data: injection
+    try {
+      const parsed = new URL(form.baseUrl)
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        toast.error('Only http and https URLs are allowed')
+        return
+      }
+    } catch {
+      toast.error('Invalid URL format')
+      return
+    }
+
     if (adding) {
       const id = addEnvironment(form)
       if (!activeEnvId) setActiveEnv(id)

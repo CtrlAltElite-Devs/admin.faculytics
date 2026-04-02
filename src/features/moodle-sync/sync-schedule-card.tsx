@@ -36,7 +36,7 @@ export function SyncScheduleCard() {
 
   const handleSave = () => {
     const value = Number(interval)
-    if (isNaN(value) || value < MOODLE_SYNC_MIN_INTERVAL_MINUTES) return
+    if (!Number.isInteger(value) || value < MOODLE_SYNC_MIN_INTERVAL_MINUTES || value > 1440) return
     updateSchedule.mutate(
       { intervalMinutes: value },
       { onSuccess: () => setOpen(false) },

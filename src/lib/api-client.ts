@@ -105,7 +105,6 @@ async function tryRefresh(envId: string, baseUrl: string): Promise<boolean> {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.refreshToken}`,
       },
       body: JSON.stringify({ refreshToken: session.refreshToken }),
     })
