@@ -142,7 +142,7 @@ export function UsersPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-5 [&_[data-slot=select-trigger]]:w-full [&_[data-slot=select-trigger]]:min-w-0">
               {/* Role filter */}
               <Select
                 value={roleFilter}

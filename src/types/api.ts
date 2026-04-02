@@ -160,6 +160,11 @@ export interface RemoveInstitutionalRoleRequest {
   moodleCategoryId: number
 }
 
+export interface DeanEligibleCategory {
+  moodleCategoryId: number
+  name: string
+}
+
 // ── Health ──
 
 export interface HealthCheckResult {

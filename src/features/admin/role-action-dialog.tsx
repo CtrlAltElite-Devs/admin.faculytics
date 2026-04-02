@@ -29,7 +29,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { useAssignRole, useRemoveRole } from './use-institutional-roles'
+import {
+  useAssignRole,
+  useDeanEligibleCategories,
+  useRemoveRole,
+} from './use-institutional-roles'
 import { UserRole } from '@/types/api'
 import type { AdminUserItem, InstitutionalRole } from '@/types/api'
 
@@ -48,6 +52,7 @@ export function RoleActionDialog({
 }: RoleActionDialogProps) {
   const assignRole = useAssignRole()
   const removeRole = useRemoveRole()
+  const deanCategories = useDeanEligibleCategories(user?.id)
 
   // Assign form state
   const [assignRoleValue, setAssignRoleValue] = useState<InstitutionalRole>(UserRole.DEAN)
@@ -163,7 +168,10 @@ export function RoleActionDialog({
                   <Label className="text-xs text-muted-foreground">Role</Label>
                   <Select
                     value={assignRoleValue}
-                    onValueChange={(v) => setAssignRoleValue(v as InstitutionalRole)}
+                    onValueChange={(v) => {
+                      setAssignRoleValue(v as InstitutionalRole)
+                      setAssignCategoryId('')
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -177,21 +185,94 @@ export function RoleActionDialog({
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">
-                    Moodle Category ID
+                    {assignRoleValue === UserRole.DEAN ? 'Department' : 'Moodle Category ID'}
                   </Label>
-                  <Input
-                    type="number"
-                    placeholder="e.g. 42"
-                    value={assignCategoryId}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setAssignCategoryId(e.target.value)
-                    }
-                  />
+                  {assignRoleValue === UserRole.DEAN ? (
+                    <Select
+                      value={assignCategoryId}
+                      onValueChange={setAssignCategoryId}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={
+                          deanCategories.isLoading
+                            ? 'Loading...'
+                            : deanCategories.data?.length === 0
+                              ? 'No eligible departments'
+                              : 'Select department'
+                        } />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(deanCategories.data ?? []).map((cat) => (
+                          <SelectItem
+                            key={cat.moodleCategoryId}
+                            value={String(cat.moodleCategoryId)}
+                          >
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      type="number"
+                      placeholder="e.g. 42"
+                      value={assignCategoryId}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setAssignCategoryId(e.target.value)
+                      }
+                    />
+                  )}
                 </div>
               </div>
+              {assignCategoryId && (
+                <div className="rounded-md border bg-muted/50 px-3 py-2.5 text-xs space-y-1">
+                  <p className="font-medium text-muted-foreground">Assignment Summary</p>
+                  <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
+                    <span className="text-muted-foreground">Role</span>
+                    <span className="font-medium">{assignRoleValue}</span>
+                    {assignRoleValue === UserRole.DEAN && (() => {
+                      const selected = deanCategories.data?.find(
+                        (c) => String(c.moodleCategoryId) === assignCategoryId,
+                      )
+                      return selected ? (
+                        <>
+                          <span className="text-muted-foreground">Department</span>
+                          <span className="font-medium">{selected.name}</span>
+                        </>
+                      ) : null
+                    })()}
+                    {assignRoleValue === UserRole.CHAIRPERSON && (
+                      <>
+                        <span className="text-muted-foreground">Category ID</span>
+                        <span className="font-medium">{assignCategoryId}</span>
+                      </>
+                    )}
+                    {user.campus && (
+                      <>
+                        <span className="text-muted-foreground">Campus</span>
+                        <span className="font-medium">
+                          {user.campus.code}{user.campus.name ? ` \u2014 ${user.campus.name}` : ''}
+                        </span>
+                      </>
+                    )}
+                    {assignRoleValue === UserRole.CHAIRPERSON && user.program && (
+                      <>
+                        <span className="text-muted-foreground">Program</span>
+                        <span className="font-medium">
+                          {user.program.code}{user.program.name ? ` \u2014 ${user.program.name}` : ''}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
               <Button
                 onClick={handleAssign}
-                disabled={!assignCategoryId || assignRole.isPending}
+                disabled={
+                  !assignCategoryId ||
+                  assignRole.isPending ||
+                  (assignRoleValue === UserRole.DEAN && deanCategories.isLoading)
+                }
                 className="w-full gap-1.5"
                 size="sm"
               >
