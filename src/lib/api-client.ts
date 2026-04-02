@@ -15,10 +15,18 @@ export class ApiError extends Error {
 }
 
 /**
+ * Prevents multiple concurrent refresh attempts.
+ * All 401s wait on the same refresh promise.
+ */
+let refreshPromise: Promise<boolean> | null = null
+
+/**
  * Thin fetch wrapper that resolves the active environment's baseUrl
  * and injects the Bearer token from the auth store.
  *
  * 401 responses trigger a single silent refresh attempt before failing.
+ * On terminal auth failure, the session is cleared and the user is
+ * redirected to /login.
  */
 export async function apiClient<T>(
   path: string,
@@ -48,12 +56,16 @@ export async function apiClient<T>(
   const token = useAuthStore.getState().getToken(resolvedEnvId)
   let res = await doFetch(token)
 
-  // Silent refresh on 401
+  // Silent refresh on 401 (deduplicated across concurrent requests)
   if (res.status === 401 && token) {
-    const refreshed = await tryRefresh(resolvedEnvId, env.baseUrl)
+    const refreshed = await deduplicatedRefresh(resolvedEnvId, env.baseUrl)
     if (refreshed) {
       const newToken = useAuthStore.getState().getToken(resolvedEnvId)
       res = await doFetch(newToken)
+    } else {
+      // Terminal auth failure — redirect to login
+      forceLogout()
+      throw new ApiError(401, { message: 'Session expired' })
     }
   }
 
@@ -66,6 +78,18 @@ export async function apiClient<T>(
   if (res.status === 204) return undefined as T
 
   return res.json() as Promise<T>
+}
+
+function deduplicatedRefresh(
+  envId: string,
+  baseUrl: string,
+): Promise<boolean> {
+  if (!refreshPromise) {
+    refreshPromise = tryRefresh(envId, baseUrl).finally(() => {
+      refreshPromise = null
+    })
+  }
+  return refreshPromise
 }
 
 async function tryRefresh(envId: string, baseUrl: string): Promise<boolean> {
@@ -101,5 +125,15 @@ async function tryRefresh(envId: string, baseUrl: string): Promise<boolean> {
   } catch {
     useAuthStore.getState().clearSession(envId)
     return false
+  }
+}
+
+function forceLogout() {
+  const envId = useEnvStore.getState().activeEnvId
+  if (envId) useAuthStore.getState().clearSession(envId)
+
+  // Navigate to login — works outside React context
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login'
   }
 }

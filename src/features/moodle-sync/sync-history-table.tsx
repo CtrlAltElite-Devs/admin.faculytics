@@ -66,16 +66,23 @@ export function SyncHistoryTable() {
               Recent Moodle synchronization runs
             </CardDescription>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => refetch()}
-            disabled={isFetching}
-          >
-            <RefreshCw
-              className={`size-4 ${isFetching ? 'animate-spin' : ''}`}
-            />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                disabled={isFetching}
+                className="gap-1.5"
+              >
+                <RefreshCw
+                  className={`size-3.5 ${isFetching ? 'animate-spin' : ''}`}
+                />
+                Refresh
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Fetch latest sync history</TooltipContent>
+          </Tooltip>
         </CardHeader>
         <CardContent>
           {isLoading && (
