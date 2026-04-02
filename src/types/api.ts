@@ -93,6 +93,73 @@ export interface MeResponse {
   }
 }
 
+// ── Admin ──
+
+export const UserRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  ADMIN: 'ADMIN',
+  DEAN: 'DEAN',
+  CHAIRPERSON: 'CHAIRPERSON',
+  FACULTY: 'FACULTY',
+  STUDENT: 'STUDENT',
+} as const
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+export interface AdminUserScopedRelation {
+  id: string
+  code: string
+  name?: string
+}
+
+export interface AdminUserItem {
+  id: string
+  userName: string
+  fullName: string
+  moodleUserId?: number
+  roles: UserRole[]
+  isActive: boolean
+  campus: AdminUserScopedRelation | null
+  department: AdminUserScopedRelation | null
+  program: AdminUserScopedRelation | null
+}
+
+export interface AdminUserListResponse {
+  data: AdminUserItem[]
+  meta: PaginationMeta
+}
+
+export interface ListUsersQuery {
+  search?: string
+  role?: UserRole
+  isActive?: boolean
+  campusId?: string
+  departmentId?: string
+  programId?: string
+  page?: number
+  limit?: number
+}
+
+export interface FilterOption {
+  id: string
+  code: string
+  name: string | null
+}
+
+export type InstitutionalRole = typeof UserRole.DEAN | typeof UserRole.CHAIRPERSON
+
+export interface AssignInstitutionalRoleRequest {
+  userId: string
+  role: InstitutionalRole
+  moodleCategoryId: number
+}
+
+export interface RemoveInstitutionalRoleRequest {
+  userId: string
+  role: InstitutionalRole
+  moodleCategoryId: number
+}
+
 // ── Health ──
 
 export interface HealthCheckResult {

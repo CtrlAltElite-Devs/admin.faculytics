@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router'
-import { Activity, LogOut, RefreshCw, Settings } from 'lucide-react'
+import { Activity, LogOut, RefreshCw, Settings, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
   { to: '/sync', label: 'Moodle Sync', icon: RefreshCw },
+  { to: '/users', label: 'Users', icon: Users },
 ] as const
 
 export function AppShell() {
