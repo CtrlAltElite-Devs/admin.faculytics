@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router'
-import { Activity, LogOut, RefreshCw, Settings, Users } from 'lucide-react'
+import { LogOut, RefreshCw, Settings, Shield, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -34,25 +34,35 @@ export function AppShell() {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className="flex w-56 flex-col border-r bg-sidebar text-sidebar-foreground">
-        <div className="flex h-14 items-center gap-2 px-4 font-semibold">
-          <Activity className="size-5" />
-          <span>Faculytics Admin</span>
+      <aside className="flex w-56 flex-col border-r border-sidebar-border bg-sidebar/80 backdrop-blur-sm text-sidebar-foreground">
+        {/* Brand */}
+        <div className="flex h-14 items-center gap-2.5 px-4">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-brand-blue text-white">
+            <Shield className="size-4" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-display text-sm font-semibold leading-tight tracking-tight">
+              Faculytics
+            </span>
+            <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+              Admin
+            </span>
+          </div>
         </div>
 
-        <Separator />
+        <Separator className="opacity-50" />
 
-        <nav className="flex-1 space-y-1 p-2">
+        <nav className="flex-1 space-y-1 p-2 pt-3">
           {navItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors',
+                  'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all duration-150',
                   isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                    : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground',
+                    ? 'bg-brand-blue/10 text-brand-blue font-medium shadow-sm shadow-brand-blue/5 dark:bg-brand-blue/15'
+                    : 'text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground',
                 )
               }
             >
@@ -62,17 +72,17 @@ export function AppShell() {
           ))}
         </nav>
 
-        <Separator />
+        <Separator className="opacity-50" />
 
-        <div className="p-2">
+        <div className="p-2 pb-3">
           <NavLink
             to="/settings"
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors',
+                'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all duration-150',
                 isActive
-                  ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                  : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground',
+                  ? 'bg-brand-blue/10 text-brand-blue font-medium dark:bg-brand-blue/15'
+                  : 'text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground',
               )
             }
           >
@@ -83,9 +93,9 @@ export function AppShell() {
       </aside>
 
       {/* Main area */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col min-w-0">
         {/* Header */}
-        <header className="flex h-14 items-center justify-between border-b px-6">
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 bg-background/60 backdrop-blur-sm px-6">
           <div className="flex items-center gap-3">
             <EnvSwitcher />
             <HealthIndicator />
@@ -104,8 +114,9 @@ export function AppShell() {
                     variant="ghost"
                     size="icon"
                     onClick={handleLogout}
+                    className="size-8"
                   >
-                    <LogOut className="size-4" />
+                    <LogOut className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Logout</TooltipContent>

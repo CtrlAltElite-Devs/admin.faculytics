@@ -15,9 +15,9 @@ function QuickStat({
   value: string | number
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg border bg-card px-4 py-3">
-      <div className="flex size-9 items-center justify-center rounded-md bg-muted">
-        <Icon className="size-4 text-muted-foreground" />
+    <div className="flex items-center gap-3 rounded-xl border border-border/70 bg-card/80 backdrop-blur-sm px-4 py-3">
+      <div className="flex size-9 items-center justify-center rounded-lg bg-brand-blue/10">
+        <Icon className="size-4 text-brand-blue" />
       </div>
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>
@@ -38,7 +38,7 @@ export function SyncDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Moodle Sync</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Moodle Sync</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Monitor and manage Moodle data synchronization
         </p>

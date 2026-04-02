@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
+import { Loader2, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuthStore } from '@/stores/auth-store'
@@ -32,14 +33,17 @@ export function LoginPage() {
   if (!activeEnvId || !activeEnv) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle>No Environment Selected</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
+        <Card className="w-full max-w-sm panel-surface">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-xl bg-brand-blue text-white">
+              <Shield className="size-6" />
+            </div>
+            <h2 className="font-display text-xl font-semibold">No Environment</h2>
+            <p className="text-sm text-muted-foreground">
               Add an environment in Settings before logging in.
             </p>
+          </CardHeader>
+          <CardContent>
             <Button className="w-full" onClick={() => navigate('/settings')}>
               Go to Settings
             </Button>
@@ -59,7 +63,6 @@ export function LoginPage() {
         body: JSON.stringify({ username, password }),
       })
 
-      // Temporarily set a partial session so the /me call has a token
       const tempSession = {
         token: loginRes.token,
         refreshToken: loginRes.refreshToken,
@@ -97,16 +100,26 @@ export function LoginPage() {
 
   return (
     <div className="flex h-full items-center justify-center">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className="w-full max-w-sm panel-surface">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-xl bg-brand-blue text-white shadow-lg shadow-brand-blue/20">
+            <Shield className="size-6" />
+          </div>
+          <h1 className="font-display text-xl font-semibold tracking-tight">
+            Faculytics Admin
+          </h1>
+          <div className="flex items-center justify-center gap-2 mt-1">
             <span
-              className="size-2.5 rounded-full"
+              className="size-2 rounded-full"
               style={{ backgroundColor: activeEnv.color }}
             />
-            Login to {activeEnv.label}
-          </CardTitle>
-          <p className="text-xs text-muted-foreground">{activeEnv.baseUrl}</p>
+            <span className="text-sm text-muted-foreground">
+              {activeEnv.label}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground/60 font-mono mt-0.5">
+            {activeEnv.baseUrl}
+          </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -118,6 +131,7 @@ export function LoginPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 autoComplete="username"
                 required
+                placeholder="superadmin"
               />
             </div>
             <div className="space-y-2">
@@ -129,10 +143,18 @@ export function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 required
+                placeholder="Enter password"
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign in'
+              )}
             </Button>
           </form>
         </CardContent>
