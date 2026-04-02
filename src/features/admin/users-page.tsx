@@ -193,7 +193,7 @@ export function UsersPage() {
                   <SelectItem value={ALL_VALUE}>All campuses</SelectItem>
                   {campuses?.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
-                      {c.name ?? c.code}
+                      {c.name || c.code}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -215,7 +215,7 @@ export function UsersPage() {
                   <SelectItem value={ALL_VALUE}>All departments</SelectItem>
                   {departments?.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
-                      {d.name ?? d.code}
+                      {d.name || d.code}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -233,7 +233,7 @@ export function UsersPage() {
                   <SelectItem value={ALL_VALUE}>All programs</SelectItem>
                   {programs?.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.name ?? p.code}
+                      {p.name || p.code}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -261,6 +261,7 @@ export function UsersPage() {
                       <TableHead>Roles</TableHead>
                       <TableHead>Campus</TableHead>
                       <TableHead>Department</TableHead>
+                      <TableHead>Program</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="w-10" />
                     </TableRow>
@@ -268,7 +269,7 @@ export function UsersPage() {
                   <TableBody>
                     {data?.data.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground py-12">
+                        <TableCell colSpan={7} className="text-center text-muted-foreground py-12">
                           No users found
                         </TableCell>
                       </TableRow>
@@ -300,7 +301,7 @@ export function UsersPage() {
                               <TooltipTrigger className="text-left">
                                 {user.campus.code}
                               </TooltipTrigger>
-                              <TooltipContent>{user.campus.name ?? user.campus.code}</TooltipContent>
+                              <TooltipContent>{user.campus.name || user.campus.code}</TooltipContent>
                             </Tooltip>
                           ) : (
                             <span className="text-muted-foreground">—</span>
@@ -312,7 +313,19 @@ export function UsersPage() {
                               <TooltipTrigger className="text-left">
                                 {user.department.code}
                               </TooltipTrigger>
-                              <TooltipContent>{user.department.name ?? user.department.code}</TooltipContent>
+                              <TooltipContent>{user.department.name || user.department.code}</TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {user.program ? (
+                            <Tooltip>
+                              <TooltipTrigger className="text-left">
+                                {user.program.code}
+                              </TooltipTrigger>
+                              <TooltipContent>{user.program.name || user.program.code}</TooltipContent>
                             </Tooltip>
                           ) : (
                             <span className="text-muted-foreground">—</span>
