@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { EnvSwitcher } from './env-switcher'
+import { ThemeToggle } from './theme-toggle'
 import { HealthIndicator } from '@/features/health/health-indicator'
 import { useAuthStore } from '@/stores/auth-store'
 import { useEnvStore } from '@/stores/env-store'
@@ -114,6 +115,7 @@ export function AppShell() {
           </div>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             {session && (
               <span className="text-sm text-muted-foreground">
                 {session.user.fullName}
