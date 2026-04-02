@@ -140,6 +140,51 @@ export interface ListUsersQuery {
   limit?: number
 }
 
+export interface AdminEnrollmentCourse {
+  id: string
+  shortname: string
+  fullname: string
+}
+
+export interface AdminEnrollmentItem {
+  id: string
+  role: string
+  isActive: boolean
+  course: AdminEnrollmentCourse
+}
+
+export interface AdminInstitutionalRoleCategory {
+  moodleCategoryId: number
+  name: string
+  depth: number
+}
+
+export interface AdminInstitutionalRoleItem {
+  id: string
+  role: string
+  source: string
+  category: AdminInstitutionalRoleCategory
+}
+
+export interface AdminUserDetail {
+  id: string
+  userName: string
+  fullName: string
+  firstName: string
+  lastName: string
+  moodleUserId?: number
+  userProfilePicture: string
+  roles: UserRole[]
+  isActive: boolean
+  lastLoginAt: string
+  createdAt: string
+  campus: AdminUserScopedRelation | null
+  department: AdminUserScopedRelation | null
+  program: AdminUserScopedRelation | null
+  enrollments: AdminEnrollmentItem[]
+  institutionalRoles: AdminInstitutionalRoleItem[]
+}
+
 export interface FilterOption {
   id: string
   code: string

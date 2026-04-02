@@ -1,5 +1,6 @@
 import { useState, useDeferredValue } from 'react'
-import { Loader2, Search, X } from 'lucide-react'
+import { useNavigate } from 'react-router'
+import { Eye, Loader2, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -49,6 +50,7 @@ export function UsersPage() {
   const [programId, setProgramId] = useState<string>(ALL_VALUE)
   const [page, setPage] = useState(1)
 
+  const navigate = useNavigate()
   const [selectedUser, setSelectedUser] = useState<AdminUserItem | null>(null)
   const [roleDialogOpen, setRoleDialogOpen] = useState(false)
 
@@ -344,14 +346,25 @@ export function UsersPage() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openRoleDialog(user)}
-                            className="text-xs"
-                          >
-                            Roles
-                          </Button>
+                          <div className="flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(`/users/${user.id}`)}
+                              className="text-xs gap-1"
+                            >
+                              <Eye className="size-3" />
+                              View
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openRoleDialog(user)}
+                              className="text-xs"
+                            >
+                              Roles
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

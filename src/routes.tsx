@@ -3,6 +3,7 @@ import { AppShell } from '@/components/layout/app-shell'
 import { AuthGuard } from '@/components/layout/auth-guard'
 import { LoginPage } from '@/features/auth/login-page'
 import { SyncDashboard } from '@/features/moodle-sync/sync-dashboard'
+import { UserDetailPage } from '@/features/admin/user-detail-page'
 import { UsersPage } from '@/features/admin/users-page'
 import { SettingsPage } from '@/features/settings/settings-page'
 
@@ -20,6 +21,7 @@ export const routes: RouteObject[] = [
         children: [
           { path: '/sync', element: <SyncDashboard /> },
           { path: '/users', element: <UsersPage /> },
+          { path: '/users/:userId', element: <UserDetailPage /> },
           { path: '/', element: <Navigate to="/sync" replace /> },
         ],
       },
