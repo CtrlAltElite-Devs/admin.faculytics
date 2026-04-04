@@ -226,3 +226,93 @@ export interface Environment {
   baseUrl: string
   color: string
 }
+
+// ── Submission Generator ──
+
+export interface FacultyFilterOption {
+  id: string
+  username: string
+  fullName: string
+}
+
+export interface CourseFilterOption {
+  id: string
+  shortname: string
+  fullname: string
+}
+
+export interface QuestionnaireTypeOption {
+  id: string
+  name: string
+  code: string
+}
+
+export interface QuestionnaireVersionOption {
+  id: string
+  versionNumber: number
+  isActive: boolean
+}
+
+export interface SubmissionStatus {
+  totalEnrolled: number
+  alreadySubmitted: number
+  availableStudents: number
+}
+
+export interface GeneratePreviewRequest {
+  versionId: string
+  facultyUsername: string
+  courseShortname: string
+}
+
+export interface GeneratedRow {
+  externalId: string
+  username: string
+  facultyUsername: string
+  courseShortname: string
+  answers: Record<string, number>
+  comment?: string
+}
+
+export interface PreviewQuestion {
+  id: string
+  text: string
+  sectionName: string
+}
+
+export interface GeneratePreviewResponse {
+  metadata: {
+    faculty: { username: string; fullName: string }
+    course: { shortname: string; fullname: string }
+    semester: { code: string; label: string; academicYear: string }
+    version: { id: string; versionNumber: number }
+    maxScore: number
+    totalEnrolled: number
+    alreadySubmitted: number
+    availableStudents: number
+    generatingCount: number
+  }
+  questions: PreviewQuestion[]
+  rows: GeneratedRow[]
+}
+
+export interface GenerateCommitRequest {
+  versionId: string
+  rows: GeneratedRow[]
+}
+
+export interface CommitRecordResult {
+  externalId: string
+  success: boolean
+  error?: string
+  internalId?: string
+}
+
+export interface CommitResult {
+  commitId: string
+  total: number
+  successes: number
+  failures: number
+  dryRun: boolean
+  records: CommitRecordResult[]
+}

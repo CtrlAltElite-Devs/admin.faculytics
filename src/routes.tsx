@@ -5,6 +5,7 @@ import { LoginPage } from '@/features/auth/login-page'
 import { SyncDashboard } from '@/features/moodle-sync/sync-dashboard'
 import { UserDetailPage } from '@/features/admin/user-detail-page'
 import { UsersPage } from '@/features/admin/users-page'
+import { GeneratorPage } from '@/features/submission-generator/generator-page'
 import { SettingsPage } from '@/features/settings/settings-page'
 
 export const routes: RouteObject[] = [
@@ -22,6 +23,7 @@ export const routes: RouteObject[] = [
           { path: '/sync', element: <SyncDashboard /> },
           { path: '/users', element: <UsersPage /> },
           { path: '/users/:userId', element: <UserDetailPage /> },
+          { path: '/submission-generator', element: <GeneratorPage /> },
           { path: '/', element: <Navigate to="/sync" replace /> },
         ],
       },
