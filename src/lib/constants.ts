@@ -7,3 +7,6 @@ export const ENV_COLORS = [
 ] as const
 
 export const MOODLE_SYNC_MIN_INTERVAL_MINUTES = 30
+
+// Update when new campuses are added to the institution
+export const CAMPUSES = ['UCMN', 'UCLM', 'UCB', 'UCMETC', 'UCPT'] as const

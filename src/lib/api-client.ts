@@ -45,7 +45,7 @@ export async function apiClient<T>(
   const doFetch = async (token?: string): Promise<Response> => {
     const headers = new Headers(options.headers)
     if (token) headers.set('Authorization', `Bearer ${token}`)
-    if (!headers.has('Content-Type') && options.body) {
+    if (!headers.has('Content-Type') && options.body && !(options.body instanceof FormData)) {
       headers.set('Content-Type', 'application/json')
     }
 

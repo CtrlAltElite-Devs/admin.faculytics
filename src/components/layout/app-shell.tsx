@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate } from 'react-router'
-import { FlaskConical, LogOut, RefreshCw, Settings, Shield, Users } from 'lucide-react'
+import { FlaskConical, LogOut, RefreshCw, Settings, Shield, Users, Wrench } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
   { to: '/sync', label: 'Moodle Sync', icon: RefreshCw },
+  { to: '/moodle-provision', label: 'Moodle Provision', icon: Wrench },
   { to: '/users', label: 'Users', icon: Users },
   { to: '/submission-generator', label: 'Submission Generator', icon: FlaskConical },
 ]
