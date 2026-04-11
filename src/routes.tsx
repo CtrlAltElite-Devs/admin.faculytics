@@ -11,11 +11,13 @@ import { SettingsPage } from '@/features/settings/settings-page'
 import { AuditLogsPage } from '@/features/audit-logs/audit-logs-page'
 
 export const routes: RouteObject[] = [
+  // Login — standalone, no shell
+  { path: '/login', element: <LoginPage /> },
+
   {
     element: <AppShell />,
     children: [
       // Public routes
-      { path: '/login', element: <LoginPage /> },
       { path: '/settings', element: <SettingsPage /> },
 
       // Protected routes

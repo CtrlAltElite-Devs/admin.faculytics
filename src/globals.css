@@ -205,6 +205,72 @@
 }
 
 @layer utilities {
+  /* Login page — staggered entrance animation */
+  @keyframes login-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes login-slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(-24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .login-stagger > * {
+    opacity: 0;
+    animation: login-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .login-stagger > *:nth-child(1) { animation-delay: 80ms; }
+  .login-stagger > *:nth-child(2) { animation-delay: 160ms; }
+  .login-stagger > *:nth-child(3) { animation-delay: 240ms; }
+  .login-stagger > *:nth-child(4) { animation-delay: 320ms; }
+  .login-stagger > *:nth-child(5) { animation-delay: 400ms; }
+
+  .login-brand-slide > * {
+    opacity: 0;
+    animation: login-slide-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .login-brand-slide > *:nth-child(1) { animation-delay: 200ms; }
+  .login-brand-slide > *:nth-child(2) { animation-delay: 380ms; }
+  .login-brand-slide > *:nth-child(3) { animation-delay: 520ms; }
+
+  /* Collapsible expand/collapse */
+  @keyframes collapsible-open {
+    from { height: 0; opacity: 0; }
+    to { height: var(--radix-collapsible-content-height); opacity: 1; }
+  }
+
+  @keyframes collapsible-close {
+    from { height: var(--radix-collapsible-content-height); opacity: 1; }
+    to { height: 0; opacity: 0; }
+  }
+
+  .env-picker-content[data-state="open"] {
+    animation: collapsible-open 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .env-picker-content[data-state="closed"] {
+    animation: collapsible-close 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .env-picker-content {
+    overflow: hidden;
+  }
+
   /* Glassmorphism panel surface */
   .panel-surface {
     @apply border border-border/70 bg-surface/85 backdrop-blur-md;
