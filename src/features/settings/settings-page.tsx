@@ -94,7 +94,7 @@ export function SettingsPage() {
     setForm((f) => ({ ...f, [field]: value }))
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6 max-w-2xl dashboard-stagger">
       <h1 className="text-2xl font-semibold">Settings</h1>
 
       <Card>

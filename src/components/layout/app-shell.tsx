@@ -136,7 +136,7 @@ export function AppShell() {
       </Sidebar>
 
       <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 bg-background/60 backdrop-blur-sm px-4">
+        <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between border-b border-border/70 bg-background/60 backdrop-blur-sm px-4">
           <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-1 h-4" />
@@ -170,7 +170,9 @@ export function AppShell() {
         </header>
 
         <div className="flex-1 overflow-auto p-6">
-          <Outlet />
+          <div className="mx-auto w-full max-w-6xl">
+            <Outlet />
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

@@ -115,7 +115,7 @@ export function AuditLogsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 dashboard-stagger">
       <div>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
           Audit Logs

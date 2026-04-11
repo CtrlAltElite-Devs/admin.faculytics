@@ -1,13 +1,7 @@
 import { useState } from 'react'
-import { Clock, Loader2, Save } from 'lucide-react'
+import { Clock, Loader2, Pencil, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -15,10 +9,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { RelativeTime } from '@/components/shared/relative-time'
 import { useSyncSchedule, useUpdateSyncSchedule } from './use-sync-schedule'
 import { MOODLE_SYNC_MIN_INTERVAL_MINUTES } from '@/lib/constants'
@@ -36,7 +34,12 @@ export function SyncScheduleCard() {
 
   const handleSave = () => {
     const value = Number(interval)
-    if (!Number.isInteger(value) || value < MOODLE_SYNC_MIN_INTERVAL_MINUTES || value > 1440) return
+    if (
+      !Number.isInteger(value) ||
+      value < MOODLE_SYNC_MIN_INTERVAL_MINUTES ||
+      value > 1440
+    )
+      return
     updateSchedule.mutate(
       { intervalMinutes: value },
       { onSuccess: () => setOpen(false) },
@@ -44,123 +47,146 @@ export function SyncScheduleCard() {
   }
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-        <div>
-          <CardTitle className="text-base">Sync Schedule</CardTitle>
-          <CardDescription>Automatic sync interval</CardDescription>
-        </div>
-        <Clock className="size-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <Card className="overflow-hidden border-t-2 border-t-brand-blue/50 flex flex-col">
+      <div className="p-5 flex flex-col flex-1 justify-between gap-3">
         {isLoading && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
-            Loading schedule...
+            Loading schedule…
           </div>
         )}
 
         {isError && (
-          <p className="text-sm text-destructive">
-            Failed to fetch schedule
-          </p>
+          <p className="text-sm text-destructive">Failed to fetch schedule</p>
         )}
 
         {data && (
           <>
-            <div className="grid grid-cols-2 gap-y-2 text-sm">
-              <span className="text-muted-foreground">Interval</span>
-              <span className="font-medium tabular-nums">
+            {/* Interval + cron */}
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm font-semibold tabular-nums">
                 Every {data.intervalMinutes} min
               </span>
-              <span className="text-muted-foreground">Cron</span>
-              <code className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded w-fit">
-                {data.cronExpression}
-              </code>
-              <span className="text-muted-foreground">Next run</span>
-              <span>
-                {data.nextExecution ? (
-                  <RelativeTime date={data.nextExecution} />
-                ) : (
-                  <span className="text-muted-foreground">—</span>
-                )}
-              </span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <code className="text-[11px] font-mono text-muted-foreground/40 cursor-default">
+                    {data.cronExpression}
+                  </code>
+                </TooltipTrigger>
+                <TooltipContent>Cron expression</TooltipContent>
+              </Tooltip>
             </div>
 
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="w-full" onClick={openDialog}>
-                  Edit Schedule
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Edit Sync Schedule</DialogTitle>
-                  <DialogDescription>
-                    Set the interval between automatic Moodle synchronizations.
-                    Minimum is {MOODLE_SYNC_MIN_INTERVAL_MINUTES} minutes.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="schedule-interval">
-                      Interval (minutes)
-                    </Label>
-                    <Input
-                      id="schedule-interval"
-                      type="number"
-                      min={MOODLE_SYNC_MIN_INTERVAL_MINUTES}
-                      value={interval}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setInterval(e.target.value)
-                      }
-                      placeholder={String(MOODLE_SYNC_MIN_INTERVAL_MINUTES)}
-                    />
-                    {Number(interval) > 0 &&
-                      Number(interval) < MOODLE_SYNC_MIN_INTERVAL_MINUTES && (
-                        <p className="text-xs text-destructive">
-                          Minimum interval is {MOODLE_SYNC_MIN_INTERVAL_MINUTES}{' '}
-                          minutes
-                        </p>
+            {/* Next run + edit */}
+            <div className="flex items-center justify-between">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5 text-sm">
+                    <Clock className="size-3.5 text-brand-blue" />
+                    <span className="font-medium">
+                      {data.nextExecution ? (
+                        <RelativeTime date={data.nextExecution} />
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
                       )}
+                    </span>
                   </div>
-                  <div className="rounded-md bg-muted p-3 text-xs space-y-1 text-muted-foreground">
-                    <p>
-                      <strong>Current:</strong> every {data.intervalMinutes} min (
-                      <code className="font-mono">{data.cronExpression}</code>)
-                    </p>
-                    {Number(interval) >= MOODLE_SYNC_MIN_INTERVAL_MINUTES && (
-                      <p>
-                        <strong>New:</strong> every {interval} min
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setOpen(false)}>
-                    Cancel
-                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Next scheduled run</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Button
-                    onClick={handleSave}
-                    disabled={
-                      updateSchedule.isPending ||
-                      Number(interval) < MOODLE_SYNC_MIN_INTERVAL_MINUTES ||
-                      Number(interval) === data.intervalMinutes
-                    }
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={openDialog}
                   >
-                    {updateSchedule.isPending ? (
-                      <Loader2 className="mr-2 size-4 animate-spin" />
-                    ) : (
-                      <Save className="mr-2 size-4" />
-                    )}
-                    Save Changes
+                    <Pencil className="size-3 text-muted-foreground" />
                   </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+                </TooltipTrigger>
+                <TooltipContent>Edit schedule</TooltipContent>
+              </Tooltip>
+            </div>
           </>
         )}
-      </CardContent>
+      </div>
+
+      {/* Edit dialog (controlled) */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Sync Schedule</DialogTitle>
+            <DialogDescription>
+              Set the interval between automatic Moodle synchronizations.
+              Minimum is {MOODLE_SYNC_MIN_INTERVAL_MINUTES} minutes.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="schedule-interval">Interval (minutes)</Label>
+              <Input
+                id="schedule-interval"
+                type="number"
+                min={MOODLE_SYNC_MIN_INTERVAL_MINUTES}
+                value={interval}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setInterval(e.target.value)
+                }
+                placeholder={String(MOODLE_SYNC_MIN_INTERVAL_MINUTES)}
+              />
+              {Number(interval) > 0 &&
+                Number(interval) < MOODLE_SYNC_MIN_INTERVAL_MINUTES && (
+                  <p className="text-xs text-destructive">
+                    Minimum interval is {MOODLE_SYNC_MIN_INTERVAL_MINUTES}{' '}
+                    minutes
+                  </p>
+                )}
+            </div>
+            {data && (
+              <div className="rounded-lg bg-muted/60 p-3 text-xs space-y-1.5 text-muted-foreground">
+                <p>
+                  <span className="font-medium text-foreground/70">
+                    Current:
+                  </span>{' '}
+                  every {data.intervalMinutes} min (
+                  <code className="font-mono text-[11px]">
+                    {data.cronExpression}
+                  </code>
+                  )
+                </p>
+                {Number(interval) >= MOODLE_SYNC_MIN_INTERVAL_MINUTES && (
+                  <p>
+                    <span className="font-medium text-foreground/70">
+                      New:
+                    </span>{' '}
+                    every {interval} min
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={
+                updateSchedule.isPending ||
+                Number(interval) < MOODLE_SYNC_MIN_INTERVAL_MINUTES ||
+                Number(interval) === data?.intervalMinutes
+              }
+            >
+              {updateSchedule.isPending ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <Save className="mr-2 size-4" />
+              )}
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }
