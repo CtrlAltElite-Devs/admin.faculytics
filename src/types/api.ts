@@ -422,6 +422,54 @@ export interface SeedUsersResponse {
   durationMs: number
 }
 
+// ── Audit Logs ──
+
+export interface AuditLogItem {
+  id: string
+  action: string
+  actorId?: string
+  actorUsername?: string
+  resourceType?: string
+  resourceId?: string
+  metadata?: Record<string, unknown>
+  browserName?: string
+  os?: string
+  ipAddress?: string
+  occurredAt: string
+}
+
+export interface AuditLogDetail {
+  id: string
+  action: string
+  actorId?: string
+  actorUsername?: string
+  resourceType?: string
+  resourceId?: string
+  metadata?: Record<string, unknown>
+  browserName?: string
+  os?: string
+  ipAddress?: string
+  occurredAt: string
+}
+
+export interface AuditLogListResponse {
+  data: AuditLogItem[]
+  meta: PaginationMeta
+}
+
+export interface ListAuditLogsQuery {
+  action?: string
+  actorId?: string
+  actorUsername?: string
+  resourceType?: string
+  resourceId?: string
+  from?: string
+  to?: string
+  search?: string
+  page?: number
+  limit?: number
+}
+
 // ── Moodle Tree Explorer ──
 
 export interface MoodleCategoryTreeNode {

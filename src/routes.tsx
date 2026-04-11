@@ -8,6 +8,7 @@ import { UsersPage } from '@/features/admin/users-page'
 import { GeneratorPage } from '@/features/submission-generator/generator-page'
 import { ProvisionPage } from '@/features/moodle-provision/provision-page'
 import { SettingsPage } from '@/features/settings/settings-page'
+import { AuditLogsPage } from '@/features/audit-logs/audit-logs-page'
 
 export const routes: RouteObject[] = [
   {
@@ -26,6 +27,7 @@ export const routes: RouteObject[] = [
           { path: '/users/:userId', element: <UserDetailPage /> },
           { path: '/submission-generator', element: <GeneratorPage /> },
           { path: '/moodle-provision', element: <ProvisionPage /> },
+          { path: '/audit-logs', element: <AuditLogsPage /> },
           { path: '/', element: <Navigate to="/sync" replace /> },
         ],
       },
