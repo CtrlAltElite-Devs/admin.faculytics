@@ -12,8 +12,8 @@ export function ProvisionPage() {
   const onBrowse = () => setTreeOpen(true)
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Moodle Provisioning</h1>
+    <div className="space-y-6 dashboard-stagger">
+      <h1 className="font-display text-2xl font-semibold tracking-tight">Moodle Provisioning</h1>
 
       <Tabs defaultValue="categories">
         <TabsList>

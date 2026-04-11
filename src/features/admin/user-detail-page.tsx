@@ -97,7 +97,7 @@ export function UserDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 dashboard-stagger">
       {/* Back link */}
       <Button variant="ghost" size="sm" asChild className="gap-1.5">
         <Link to="/users">
