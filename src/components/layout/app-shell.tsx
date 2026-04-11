@@ -1,7 +1,31 @@
-import { NavLink, Outlet, useNavigate } from 'react-router'
-import { FileText, FlaskConical, LogOut, RefreshCw, Settings, Shield, Users, Wrench } from 'lucide-react'
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router'
+import {
+  FileText,
+  FlaskConical,
+  LogOut,
+  RefreshCw,
+  Settings,
+  Shield,
+  Users,
+  Wrench,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
 import {
   Tooltip,
   TooltipContent,
@@ -12,7 +36,7 @@ import { ThemeToggle } from './theme-toggle'
 import { HealthIndicator } from '@/features/health/health-indicator'
 import { useAuthStore } from '@/stores/auth-store'
 import { useEnvStore } from '@/stores/env-store'
-import { cn } from '@/lib/utils'
+import { useSidebarStore } from '@/stores/sidebar-store'
 
 const navItems = [
   { to: '/sync', label: 'Moodle Sync', icon: RefreshCw },
@@ -24,15 +48,17 @@ const navItems = [
 
 export function AppShell() {
   const navigate = useNavigate()
+  const location = useLocation()
   const activeEnvId = useEnvStore((s) => s.activeEnvId)
   const session = useAuthStore((s) =>
     activeEnvId ? s.getSession(activeEnvId) : undefined,
   )
   const clearSession = useAuthStore((s) => s.clearSession)
+  const sidebarOpen = useSidebarStore((s) => s.open)
+  const setSidebarOpen = useSidebarStore((s) => s.setOpen)
 
   const handleLogout = async () => {
     if (activeEnvId) {
-      // Attempt server-side token invalidation before clearing client state
       const env = useEnvStore.getState().environments.find((e) => e.id === activeEnvId)
       const token = useAuthStore.getState().getToken(activeEnvId)
       if (env && token) {
@@ -40,7 +66,7 @@ export function AppShell() {
         fetch(url, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
-        }).catch(() => {})  // Best-effort — don't block logout on network failure
+        }).catch(() => {})
       }
       clearSession(activeEnvId)
     }
@@ -48,71 +74,72 @@ export function AppShell() {
   }
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <aside className="flex w-56 flex-col border-r border-sidebar-border bg-sidebar/80 backdrop-blur-sm text-sidebar-foreground">
-        {/* Brand */}
-        <div className="flex h-14 items-center gap-2.5 px-4">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-brand-blue text-white">
-            <Shield className="size-4" />
+    <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
+      <Sidebar variant="inset" collapsible="icon">
+        <SidebarHeader className="p-3 pb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-blue text-white shadow-md shadow-brand-blue/25">
+              <Shield className="size-4" />
+            </div>
+            <div className="flex flex-col overflow-hidden">
+              <span className="truncate font-display text-sm font-semibold leading-tight tracking-tight">
+                Faculytics
+              </span>
+              <span className="truncate text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/40">
+                Admin
+              </span>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="font-display text-sm font-semibold leading-tight tracking-tight">
-              Faculytics
-            </span>
-            <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-              Admin
-            </span>
-          </div>
-        </div>
+        </SidebarHeader>
 
-        <Separator className="opacity-50" />
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {navItems.map(({ to, label, icon: Icon }) => (
+                  <SidebarMenuItem key={to}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location.pathname === to || location.pathname.startsWith(to + '/')}
+                      tooltip={label}
+                    >
+                      <NavLink to={to}>
+                        <Icon />
+                        <span>{label}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
 
-        <nav className="flex-1 space-y-1 p-2 pt-3">
-          {navItems.map(({ to, label, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all duration-150',
-                  isActive
-                    ? 'bg-brand-blue/10 text-brand-blue font-medium shadow-sm shadow-brand-blue/5 dark:bg-brand-blue/15'
-                    : 'text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground',
-                )
-              }
-            >
-              <Icon className="size-4" />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
+        <SidebarFooter className="border-t border-sidebar-border/60 pt-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={location.pathname === '/settings'}
+                tooltip="Settings"
+              >
+                <NavLink to="/settings">
+                  <Settings />
+                  <span>Settings</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
 
-        <Separator className="opacity-50" />
+      </Sidebar>
 
-        <div className="p-2 pb-3">
-          <NavLink
-            to="/settings"
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-all duration-150',
-                isActive
-                  ? 'bg-brand-blue/10 text-brand-blue font-medium dark:bg-brand-blue/15'
-                  : 'text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-foreground',
-              )
-            }
-          >
-            <Settings className="size-4" />
-            Settings
-          </NavLink>
-        </div>
-      </aside>
-
-      {/* Main area */}
-      <div className="flex flex-1 flex-col min-w-0">
-        {/* Header */}
-        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 bg-background/60 backdrop-blur-sm px-6">
-          <div className="flex items-center gap-3">
+      <SidebarInset>
+        <header className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 bg-background/60 backdrop-blur-sm px-4">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-1 h-4" />
             <EnvSwitcher />
             <HealthIndicator />
           </div>
@@ -142,11 +169,10 @@ export function AppShell() {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-6">
           <Outlet />
-        </main>
-      </div>
-    </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

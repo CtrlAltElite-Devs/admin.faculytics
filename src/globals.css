@@ -160,6 +160,50 @@
   }
 }
 
+@layer components {
+  /* Glassmorphic sidebar surface */
+  [data-slot="sidebar-inner"] {
+    background: color-mix(in oklch, var(--sidebar) 88%, transparent);
+    backdrop-filter: blur(12px) saturate(1.3);
+  }
+
+  /* Snappy easing for sidebar collapse/expand */
+  [data-slot="sidebar-gap"],
+  [data-slot="sidebar-container"] {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Sidebar right border — softer edge */
+  [data-slot="sidebar-container"] {
+    border-color: var(--sidebar-border);
+  }
+
+  /* Active menu button — brand-blue tinted background + text */
+  [data-sidebar="menu-button"][data-active="true"] {
+    background: color-mix(in oklch, var(--brand-blue) 12%, transparent);
+    color: var(--brand-blue);
+    @apply font-medium;
+  }
+
+  .dark [data-sidebar="menu-button"][data-active="true"] {
+    background: color-mix(in oklch, var(--brand-blue) 18%, transparent);
+  }
+
+  [data-sidebar="menu-button"][data-active="true"] svg {
+    color: var(--brand-blue);
+  }
+
+  /* Hover micro-interaction */
+  [data-sidebar="menu-button"] {
+    @apply transition-all duration-150 ease-out;
+  }
+
+  /* Group label — editorial treatment */
+  [data-sidebar="group-label"] {
+    @apply text-[10px] uppercase tracking-[0.12em] font-semibold text-sidebar-foreground/40;
+  }
+}
+
 @layer utilities {
   /* Glassmorphism panel surface */
   .panel-surface {
