@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Plus, X, Loader2 } from 'lucide-react'
+import { FolderTree, Plus, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
-import { CAMPUSES } from '@/lib/constants'
+import { CAMPUSES, getSemesterDates } from '@/lib/constants'
 import { useProvisionCategories } from '../use-provision-categories'
 import { ProvisionResultDialog } from './provision-result-dialog'
 import type { ProvisionResultResponse } from '@/types/api'
@@ -15,7 +15,11 @@ interface DeptEntry {
   programs: string[]
 }
 
-export function CategoriesTab() {
+interface CategoriesTabProps {
+  onBrowse: () => void
+}
+
+export function CategoriesTab({ onBrowse }: CategoriesTabProps) {
   const [selectedCampuses, setSelectedCampuses] = useState<string[]>([])
   const [selectedSemesters, setSelectedSemesters] = useState<number[]>([])
   const [startDate, setStartDate] = useState('')
@@ -32,10 +36,32 @@ export function CategoriesTab() {
       prev.includes(campus) ? prev.filter((c) => c !== campus) : [...prev, campus],
     )
 
-  const toggleSemester = (sem: number) =>
-    setSelectedSemesters((prev) =>
-      prev.includes(sem) ? prev.filter((s) => s !== sem) : [...prev, sem],
-    )
+  const toggleSemester = (sem: number) => {
+    const next = selectedSemesters.includes(sem)
+      ? selectedSemesters.filter((s) => s !== sem)
+      : [...selectedSemesters, sem]
+    setSelectedSemesters(next)
+
+    // Auto-fill dates based on selected semesters
+    if (next.length > 0) {
+      const now = new Date()
+      const currentYear = now.getFullYear()
+      // Academic year: if past July, use currentYear–nextYear; otherwise lastYear–currentYear
+      const startYear = now.getMonth() >= 6 ? currentYear : currentYear - 1
+      const endYear = startYear + 1
+
+      const allDates = next
+        .map((s) => getSemesterDates(s, startYear, endYear))
+        .filter(Boolean) as { startDate: string; endDate: string }[]
+
+      if (allDates.length > 0) {
+        const earliest = allDates.reduce((a, b) => (a.startDate < b.startDate ? a : b))
+        const latest = allDates.reduce((a, b) => (a.endDate > b.endDate ? a : b))
+        setStartDate(earliest.startDate)
+        setEndDate(latest.endDate)
+      }
+    }
+  }
 
   const addDepartment = () => {
     const code = deptInput.trim().toUpperCase()
@@ -201,10 +227,16 @@ export function CategoriesTab() {
         ))}
       </div>
 
-      <Button onClick={handleSubmit} disabled={!isValid || mutation.isPending}>
-        {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Provision Categories
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button onClick={handleSubmit} disabled={!isValid || mutation.isPending}>
+          {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Provision Categories
+        </Button>
+        <Button variant="outline" onClick={onBrowse}>
+          <FolderTree className="mr-2 h-4 w-4" />
+          Browse existing categories
+        </Button>
+      </div>
 
       <ProvisionResultDialog result={result} open={!!result} onClose={resetForm} />
     </div>

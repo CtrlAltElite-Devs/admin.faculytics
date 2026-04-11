@@ -421,3 +421,38 @@ export interface SeedUsersResponse {
   warnings: string[]
   durationMs: number
 }
+
+// ── Moodle Tree Explorer ──
+
+export interface MoodleCategoryTreeNode {
+  id: number
+  name: string
+  depth: number
+  coursecount: number
+  /** 0=hidden, 1=visible (Moodle convention) */
+  visible: number
+  children: MoodleCategoryTreeNode[]
+}
+
+export interface MoodleCategoryTreeResponse {
+  tree: MoodleCategoryTreeNode[]
+  fetchedAt: string
+  totalCategories: number
+}
+
+export interface MoodleCoursePreview {
+  id: number
+  shortname: string
+  fullname: string
+  /** May be 0 or absent depending on Moodle version/master key permissions */
+  enrolledusercount?: number
+  /** 0=hidden, 1=visible (Moodle convention) */
+  visible: number
+  startdate: number
+  enddate: number
+}
+
+export interface MoodleCategoryCoursesResponse {
+  categoryId: number
+  courses: MoodleCoursePreview[]
+}

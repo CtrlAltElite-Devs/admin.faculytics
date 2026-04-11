@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, FolderTree, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,7 +26,11 @@ import type {
 
 type View = 'upload' | 'preview'
 
-export function CoursesBulkTab() {
+interface CoursesBulkTabProps {
+  onBrowse: () => void
+}
+
+export function CoursesBulkTab({ onBrowse }: CoursesBulkTabProps) {
   const [view, setView] = useState<View>('upload')
   const [campus, setCampus] = useState('')
   const [department, setDepartment] = useState('')
@@ -127,10 +131,16 @@ export function CoursesBulkTab() {
           <CsvDropZone file={file} onFileSelect={setFile} />
         </div>
 
-        <Button onClick={handlePreview} disabled={!canPreview || previewMutation.isPending}>
-          {previewMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Preview
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button onClick={handlePreview} disabled={!canPreview || previewMutation.isPending}>
+            {previewMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Preview
+          </Button>
+          <Button variant="outline" size="sm" onClick={onBrowse}>
+            <FolderTree className="mr-2 h-4 w-4" />
+            Browse existing
+          </Button>
+        </div>
       </div>
     )
   }

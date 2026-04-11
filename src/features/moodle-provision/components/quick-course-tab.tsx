@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Loader2 } from 'lucide-react'
+import { useState, useEffect, useMemo } from 'react'
+import { FolderTree, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,12 +11,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { CAMPUSES } from '@/lib/constants'
+import { CAMPUSES, getSemesterDates } from '@/lib/constants'
 import { useDebouncedValue, useQuickCoursePreview, useQuickCourseCreate } from '../use-quick-course'
 import { ProvisionResultDialog } from './provision-result-dialog'
 import type { QuickCourseRequest, ProvisionResultResponse } from '@/types/api'
 
-export function QuickCourseTab() {
+interface QuickCourseTabProps {
+  onBrowse: () => void
+}
+
+export function QuickCourseTab({ onBrowse }: QuickCourseTabProps) {
   const [courseCode, setCourseCode] = useState('')
   const [descriptiveTitle, setDescriptiveTitle] = useState('')
   const [campus, setCampus] = useState('')
@@ -30,10 +34,12 @@ export function QuickCourseTab() {
   const previewMutation = useQuickCoursePreview()
   const createMutation = useQuickCourseCreate()
 
-  const formValues: QuickCourseRequest | null =
-    courseCode && descriptiveTitle && campus && department && program && semester && startDate && endDate && startDate < endDate
-      ? { courseCode, descriptiveTitle, campus, department, program, semester, startDate, endDate }
-      : null
+  const formValues = useMemo<QuickCourseRequest | null>(() => {
+    if (courseCode && descriptiveTitle && campus && department && program && semester && startDate && endDate && startDate < endDate) {
+      return { courseCode, descriptiveTitle, campus, department, program, semester, startDate, endDate }
+    }
+    return null
+  }, [courseCode, descriptiveTitle, campus, department, program, semester, startDate, endDate])
 
   const [debouncedValues] = useDebouncedValue(formValues, 300)
 
@@ -87,7 +93,18 @@ export function QuickCourseTab() {
         </div>
         <div className="space-y-2">
           <Label>Semester</Label>
-          <Select value={semester?.toString() ?? ''} onValueChange={(v) => setSemester(Number(v))}>
+          <Select value={semester?.toString() ?? ''} onValueChange={(v) => {
+            const sem = Number(v)
+            setSemester(sem)
+            const now = new Date()
+            const currentYear = now.getFullYear()
+            const startYear = now.getMonth() >= 6 ? currentYear : currentYear - 1
+            const dates = getSemesterDates(sem, startYear, startYear + 1)
+            if (dates) {
+              setStartDate(dates.startDate)
+              setEndDate(dates.endDate)
+            }
+          }}>
             <SelectTrigger><SelectValue placeholder="Select semester" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="1">Semester 1</SelectItem>
@@ -140,13 +157,19 @@ export function QuickCourseTab() {
         </CardContent>
       </Card>
 
-      <Button
-        onClick={handleCreate}
-        disabled={!formValues || !previewMutation.data || createMutation.isPending}
-      >
-        {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Create Course
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button
+          onClick={handleCreate}
+          disabled={!formValues || !previewMutation.data || createMutation.isPending}
+        >
+          {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Create Course
+        </Button>
+        <Button variant="outline" size="sm" onClick={onBrowse}>
+          <FolderTree className="mr-2 h-4 w-4" />
+          Browse existing
+        </Button>
+      </div>
 
       <ProvisionResultDialog
         result={result}
