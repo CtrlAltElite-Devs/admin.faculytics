@@ -316,3 +316,191 @@ export interface CommitResult {
   dryRun: boolean
   records: CommitRecordResult[]
 }
+
+// ── Moodle Provisioning ──
+
+export interface ProvisionCategoriesRequest {
+  campuses: string[]
+  semesters: number[]
+  startDate: string
+  endDate: string
+  departments: { code: string; programs: string[] }[]
+}
+
+export interface ProvisionDetailItem {
+  name: string
+  status: 'created' | 'skipped' | 'error'
+  reason?: string
+  moodleId?: number
+}
+
+export interface ProvisionResultResponse {
+  created: number
+  skipped: number
+  errors: number
+  details: ProvisionDetailItem[]
+  durationMs: number
+  syncCompleted?: boolean
+}
+
+export interface SeedCoursesContext {
+  campus: string
+  department: string
+  startDate: string
+  endDate: string
+}
+
+export interface CoursePreviewRow {
+  shortname: string
+  fullname: string
+  categoryPath: string
+  categoryId: number
+  startDate: string
+  endDate: string
+  program: string
+  semester: string
+  courseCode: string
+}
+
+export interface SkippedRow {
+  rowNumber: number
+  courseCode: string
+  reason: string
+}
+
+export interface ParseError {
+  rowNumber: number
+  message: string
+}
+
+export interface CoursePreviewResponse {
+  valid: CoursePreviewRow[]
+  skipped: SkippedRow[]
+  errors: ParseError[]
+  shortnameNote: string
+}
+
+export interface ConfirmedCourseRow {
+  courseCode: string
+  descriptiveTitle: string
+  program: string
+  semester: string
+  categoryId: number
+}
+
+export interface ExecuteCoursesRequest {
+  rows: ConfirmedCourseRow[]
+  campus: string
+  department: string
+  startDate: string
+  endDate: string
+}
+
+export interface QuickCourseRequest {
+  courseCode: string
+  descriptiveTitle: string
+  campus: string
+  department: string
+  program: string
+  semester: number
+  startDate: string
+  endDate: string
+}
+
+export interface SeedUsersRequest {
+  count: number
+  role: 'student' | 'faculty'
+  campus: string
+  courseIds: number[]
+}
+
+export interface SeedUsersResponse {
+  usersCreated: number
+  usersFailed: number
+  enrolmentsCreated: number
+  warnings: string[]
+  durationMs: number
+}
+
+// ── Audit Logs ──
+
+export interface AuditLogItem {
+  id: string
+  action: string
+  actorId?: string
+  actorUsername?: string
+  resourceType?: string
+  resourceId?: string
+  metadata?: Record<string, unknown>
+  browserName?: string
+  os?: string
+  ipAddress?: string
+  occurredAt: string
+}
+
+export interface AuditLogDetail {
+  id: string
+  action: string
+  actorId?: string
+  actorUsername?: string
+  resourceType?: string
+  resourceId?: string
+  metadata?: Record<string, unknown>
+  browserName?: string
+  os?: string
+  ipAddress?: string
+  occurredAt: string
+}
+
+export interface AuditLogListResponse {
+  data: AuditLogItem[]
+  meta: PaginationMeta
+}
+
+export interface ListAuditLogsQuery {
+  action?: string
+  actorId?: string
+  actorUsername?: string
+  resourceType?: string
+  resourceId?: string
+  from?: string
+  to?: string
+  search?: string
+  page?: number
+  limit?: number
+}
+
+// ── Moodle Tree Explorer ──
+
+export interface MoodleCategoryTreeNode {
+  id: number
+  name: string
+  depth: number
+  coursecount: number
+  /** 0=hidden, 1=visible (Moodle convention) */
+  visible: number
+  children: MoodleCategoryTreeNode[]
+}
+
+export interface MoodleCategoryTreeResponse {
+  tree: MoodleCategoryTreeNode[]
+  fetchedAt: string
+  totalCategories: number
+}
+
+export interface MoodleCoursePreview {
+  id: number
+  shortname: string
+  fullname: string
+  /** May be 0 or absent depending on Moodle version/master key permissions */
+  enrolledusercount?: number
+  /** 0=hidden, 1=visible (Moodle convention) */
+  visible: number
+  startdate: number
+  enddate: number
+}
+
+export interface MoodleCategoryCoursesResponse {
+  categoryId: number
+  courses: MoodleCoursePreview[]
+}
