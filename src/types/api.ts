@@ -317,6 +317,18 @@ export interface CommitResult {
   records: CommitRecordResult[]
 }
 
+// ── Semester Filter ──
+
+export interface SemesterFilterOption {
+  id: string
+  code: string
+  label: string
+  academicYear: string
+  campusCode: string
+  startDate: string
+  endDate: string
+}
+
 // ── Moodle Provisioning ──
 
 export interface ProvisionCategoriesRequest {
@@ -405,6 +417,24 @@ export interface QuickCourseRequest {
   semester: number
   startDate: string
   endDate: string
+}
+
+export interface BulkCoursePreviewRequest {
+  semesterId: string
+  departmentId: string
+  programId: string
+  startDate: string
+  endDate: string
+  courses: { courseCode: string; descriptiveTitle: string }[]
+}
+
+export interface BulkCourseExecuteRequest {
+  semesterId: string
+  departmentId: string
+  programId: string
+  startDate: string
+  endDate: string
+  courses: { courseCode: string; descriptiveTitle: string; categoryId: number }[]
 }
 
 export interface SeedUsersRequest {

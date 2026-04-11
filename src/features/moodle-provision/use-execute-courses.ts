@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { apiClient, ApiError } from '@/lib/api-client'
-import type { ExecuteCoursesRequest, ProvisionResultResponse } from '@/types/api'
+import type { BulkCourseExecuteRequest, ProvisionResultResponse } from '@/types/api'
 
-export function useExecuteCourses() {
+export function useExecuteBulkCourses() {
   return useMutation({
-    mutationFn: (data: ExecuteCoursesRequest) =>
-      apiClient<ProvisionResultResponse>('/moodle/provision/courses/execute', {
+    mutationFn: (data: BulkCourseExecuteRequest) =>
+      apiClient<ProvisionResultResponse>('/moodle/provision/courses/bulk/execute', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
