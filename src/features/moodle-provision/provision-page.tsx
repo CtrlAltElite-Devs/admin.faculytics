@@ -36,7 +36,7 @@ export function ProvisionPage() {
         </TabsContent>
 
         <TabsContent value="seed-users" className="mt-6">
-          <SeedUsersTab />
+          <SeedUsersTab onBrowse={onBrowse} />
         </TabsContent>
       </Tabs>
 

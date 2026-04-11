@@ -10,9 +10,6 @@ export function useSeedUsers() {
         method: 'POST',
         body: JSON.stringify(data),
       }),
-    onSuccess: (data) => {
-      toast.success(`Users seeded: ${data.usersCreated} created, ${data.enrolmentsCreated} enrolments`)
-    },
     onError: (err) => {
       if (err instanceof ApiError && err.status === 409) {
         toast.error('A provisioning operation is already in progress')

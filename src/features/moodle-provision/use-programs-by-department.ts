@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import { useEnvStore } from '@/stores/env-store'
 import { useAuthStore } from '@/stores/auth-store'
-import type { FilterOption } from '@/types/api'
+import type { ProgramFilterOption } from '@/types/api'
 
 export function useProgramsByDepartment(departmentId: string | undefined) {
   const activeEnvId = useEnvStore((s) => s.activeEnvId)
@@ -13,7 +13,7 @@ export function useProgramsByDepartment(departmentId: string | undefined) {
   return useQuery({
     queryKey: ['filters', 'programs', activeEnvId, { departmentId }],
     queryFn: () =>
-      apiClient<FilterOption[]>(
+      apiClient<ProgramFilterOption[]>(
         `/admin/filters/programs?departmentId=${departmentId}`,
       ),
     enabled: !!activeEnvId && isAuth && !!departmentId,

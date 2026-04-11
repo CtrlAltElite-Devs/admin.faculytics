@@ -191,6 +191,10 @@ export interface FilterOption {
   name: string | null
 }
 
+export interface ProgramFilterOption extends FilterOption {
+  moodleCategoryId: number
+}
+
 export type InstitutionalRole = typeof UserRole.DEAN | typeof UserRole.CHAIRPERSON
 
 export interface AssignInstitutionalRoleRequest {
