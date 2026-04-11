@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { FolderTree, Plus, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -6,9 +7,9 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 import { CAMPUSES, getSemesterDates } from '@/lib/constants'
-import { useProvisionCategories } from '../use-provision-categories'
+import { usePreviewCategories, useProvisionCategories } from '../use-provision-categories'
 import { ProvisionResultDialog } from './provision-result-dialog'
-import type { ProvisionResultResponse } from '@/types/api'
+import type { ProvisionCategoriesRequest, ProvisionResultResponse } from '@/types/api'
 
 interface DeptEntry {
   code: string
@@ -28,8 +29,11 @@ export function CategoriesTab({ onBrowse }: CategoriesTabProps) {
   const [deptInput, setDeptInput] = useState('')
   const [programInputs, setProgramInputs] = useState<Record<string, string>>({})
   const [result, setResult] = useState<ProvisionResultResponse | null>(null)
+  const [preview, setPreview] = useState<ProvisionResultResponse | null>(null)
+  const [previewPayload, setPreviewPayload] = useState<ProvisionCategoriesRequest | null>(null)
 
-  const mutation = useProvisionCategories()
+  const previewMutation = usePreviewCategories()
+  const provisionMutation = useProvisionCategories()
 
   const toggleCampus = (campus: string) =>
     setSelectedCampuses((prev) =>
@@ -102,17 +106,34 @@ export function CategoriesTab({ onBrowse }: CategoriesTabProps) {
     departments.length > 0 &&
     departments.every((d) => d.programs.length > 0)
 
-  const handleSubmit = () => {
-    mutation.mutate(
-      {
-        campuses: selectedCampuses,
-        semesters: selectedSemesters,
-        startDate,
-        endDate,
-        departments,
+  const handlePreview = () => {
+    const payload: ProvisionCategoriesRequest = {
+      campuses: selectedCampuses,
+      semesters: selectedSemesters,
+      startDate,
+      endDate,
+      departments,
+    }
+    previewMutation.mutate(payload, {
+      onSuccess: (data) => {
+        setPreviewPayload(payload)
+        setPreview(data)
       },
-      { onSuccess: (data) => setResult(data) },
-    )
+    })
+  }
+
+  const handleConfirm = () => {
+    if (!previewPayload) return
+    provisionMutation.mutate(previewPayload, {
+      onSuccess: (data) => {
+        setPreview(null)
+        setPreviewPayload(null)
+        setResult(data)
+      },
+      onError: () => {
+        toast.error('Provisioning failed. You can retry or cancel.')
+      },
+    })
   }
 
   const resetForm = () => {
@@ -122,6 +143,8 @@ export function CategoriesTab({ onBrowse }: CategoriesTabProps) {
     setEndDate('')
     setDepartments([])
     setResult(null)
+    setPreview(null)
+    setPreviewPayload(null)
   }
 
   return (
@@ -228,15 +251,24 @@ export function CategoriesTab({ onBrowse }: CategoriesTabProps) {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button onClick={handleSubmit} disabled={!isValid || mutation.isPending}>
-          {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Provision Categories
+        <Button onClick={handlePreview} disabled={!isValid || previewMutation.isPending}>
+          {previewMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Preview Categories
         </Button>
         <Button variant="outline" onClick={onBrowse}>
           <FolderTree className="mr-2 h-4 w-4" />
           Browse existing categories
         </Button>
       </div>
+
+      <ProvisionResultDialog
+        result={preview}
+        open={!!preview}
+        onClose={() => { setPreview(null); setPreviewPayload(null) }}
+        mode="preview"
+        onConfirm={handleConfirm}
+        isConfirming={provisionMutation.isPending}
+      />
 
       <ProvisionResultDialog result={result} open={!!result} onClose={resetForm} />
     </div>

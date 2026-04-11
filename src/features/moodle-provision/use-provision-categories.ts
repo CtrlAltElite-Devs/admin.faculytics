@@ -3,6 +3,23 @@ import { toast } from 'sonner'
 import { apiClient, ApiError } from '@/lib/api-client'
 import type { ProvisionCategoriesRequest, ProvisionResultResponse } from '@/types/api'
 
+export function usePreviewCategories() {
+  return useMutation({
+    mutationFn: (data: ProvisionCategoriesRequest) =>
+      apiClient<ProvisionResultResponse>('/moodle/provision/categories/preview', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    onError: (err) => {
+      if (err instanceof ApiError) {
+        toast.error(err.message)
+      } else {
+        toast.error('Failed to preview categories')
+      }
+    },
+  })
+}
+
 export function useProvisionCategories() {
   return useMutation({
     mutationFn: (data: ProvisionCategoriesRequest) =>

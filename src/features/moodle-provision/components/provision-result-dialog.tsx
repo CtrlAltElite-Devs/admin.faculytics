@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Loader2 } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -22,6 +23,9 @@ interface ProvisionResultDialogProps {
   result: ProvisionResultResponse | null
   open: boolean
   onClose: () => void
+  mode?: 'preview' | 'result'
+  onConfirm?: () => void
+  isConfirming?: boolean
 }
 
 const statusVariant = {
@@ -30,10 +34,18 @@ const statusVariant = {
   error: 'destructive' as const,
 }
 
+const statusLabel: Record<string, Record<string, string>> = {
+  preview: { created: 'will create', skipped: 'exists', error: 'error' },
+  result: { created: 'created', skipped: 'skipped', error: 'error' },
+}
+
 export function ProvisionResultDialog({
   result,
   open,
   onClose,
+  mode = 'result',
+  onConfirm,
+  isConfirming,
 }: ProvisionResultDialogProps) {
   if (!result) return null
 
@@ -41,21 +53,27 @@ export function ProvisionResultDialog({
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Provisioning Result</DialogTitle>
+          <DialogTitle>
+            {mode === 'preview' ? 'Category Preview' : 'Provisioning Result'}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex gap-3 text-sm">
-          <Badge variant="default">{result.created} created</Badge>
-          <Badge variant="secondary">{result.skipped} skipped</Badge>
+          <Badge variant="default">
+            {result.created} {mode === 'preview' ? 'to create' : 'created'}
+          </Badge>
+          <Badge variant="secondary">
+            {result.skipped} {mode === 'preview' ? 'existing' : 'skipped'}
+          </Badge>
           {result.errors > 0 && (
             <Badge variant="destructive">{result.errors} errors</Badge>
           )}
           <span className="ml-auto text-muted-foreground">
-            Completed in {result.durationMs}ms
+            {mode === 'preview' ? 'Preview' : 'Completed'} in {result.durationMs}ms
           </span>
         </div>
 
-        {result.syncCompleted === false && (
+        {result.syncCompleted === false && mode === 'result' && (
           <div className="rounded-md border border-amber-500/50 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-400">
             Categories created in Moodle but local sync failed. Trigger a manual sync before seeding courses.
           </div>
@@ -68,8 +86,8 @@ export function ProvisionResultDialog({
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Reason</TableHead>
+                  {mode === 'result' && <TableHead>ID</TableHead>}
+                  {mode === 'result' && <TableHead>Reason</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -78,13 +96,17 @@ export function ProvisionResultDialog({
                     <TableCell className="font-mono text-xs">{d.name}</TableCell>
                     <TableCell>
                       <Badge variant={statusVariant[d.status]} className="text-xs">
-                        {d.status}
+                        {statusLabel[mode][d.status]}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs">{d.moodleId ?? '—'}</TableCell>
-                    <TableCell className="max-w-48 truncate text-xs text-muted-foreground">
-                      {d.reason ?? '—'}
-                    </TableCell>
+                    {mode === 'result' && (
+                      <TableCell className="text-xs">{d.moodleId ?? '—'}</TableCell>
+                    )}
+                    {mode === 'result' && (
+                      <TableCell className="max-w-48 truncate text-xs text-muted-foreground">
+                        {d.reason ?? '—'}
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -93,7 +115,19 @@ export function ProvisionResultDialog({
         )}
 
         <DialogFooter>
-          <Button onClick={onClose}>Close</Button>
+          {onConfirm ? (
+            <>
+              <Button variant="outline" onClick={onClose} disabled={isConfirming}>
+                Cancel
+              </Button>
+              <Button onClick={onConfirm} disabled={isConfirming}>
+                {isConfirming && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Confirm & Provision
+              </Button>
+            </>
+          ) : (
+            <Button onClick={onClose}>Close</Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
