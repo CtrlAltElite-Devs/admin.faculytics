@@ -181,8 +181,23 @@ export interface AdminUserDetail {
   campus: AdminUserScopedRelation | null
   department: AdminUserScopedRelation | null
   program: AdminUserScopedRelation | null
+  departmentSource: string
+  programSource: string
   enrollments: AdminEnrollmentItem[]
   institutionalRoles: AdminInstitutionalRoleItem[]
+}
+
+export interface AdminUserScopeAssignment {
+  id: string
+  department: AdminUserScopedRelation | null
+  program: AdminUserScopedRelation | null
+  departmentSource: string
+  programSource: string
+}
+
+export interface UpdateScopeAssignmentRequest {
+  departmentId?: string | null
+  programId?: string | null
 }
 
 export interface FilterOption {

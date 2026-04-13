@@ -3,9 +3,11 @@ import { useParams, Link } from 'react-router'
 import {
   ArrowLeft,
   BookOpen,
+  Building2,
   Copy,
   Check,
   Loader2,
+  Pencil,
   Shield,
   User,
 } from 'lucide-react'
@@ -31,6 +33,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { ScopeAssignmentDialog } from './scope-assignment-dialog'
 import { useUserDetail } from './use-user-detail'
 
 const ROLE_COLORS: Record<string, string> = {
@@ -69,6 +72,7 @@ function formatDate(date: string) {
 export function UserDetailPage() {
   const { userId } = useParams<{ userId: string }>()
   const { data: user, isLoading, error } = useUserDetail(userId)
+  const [scopeDialogOpen, setScopeDialogOpen] = useState(false)
 
   if (isLoading) {
     return (
@@ -159,8 +163,6 @@ export function UserDetailPage() {
           {/* Meta grid */}
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             <MetaCell label="Campus" value={user.campus?.name || user.campus?.code} />
-            <MetaCell label="Department" value={user.department?.name || user.department?.code} />
-            <MetaCell label="Program" value={user.program?.name || user.program?.code} />
             <MetaCell
               label="Moodle ID"
               value={user.moodleUserId != null ? String(user.moodleUserId) : undefined}
@@ -168,6 +170,46 @@ export function UserDetailPage() {
             />
             <MetaCell label="Last login" value={user.lastLoginAt ? formatDate(user.lastLoginAt) : undefined} />
             <MetaCell label="Created" value={user.createdAt ? formatDate(user.createdAt) : undefined} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Institutional assignment card */}
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Building2 className="size-4 text-muted-foreground" />
+              <div>
+                <CardTitle className="text-base">Institutional Assignment</CardTitle>
+                <CardDescription>
+                  Department and program assignments — used for analytics scoping
+                </CardDescription>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => setScopeDialogOpen(true)}
+            >
+              <Pencil className="size-3.5" />
+              Edit
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <ScopeAssignmentRow
+              label="Department"
+              relation={user.department}
+              source={user.departmentSource}
+            />
+            <ScopeAssignmentRow
+              label="Program"
+              relation={user.program}
+              source={user.programSource}
+            />
           </div>
         </CardContent>
       </Card>
@@ -292,6 +334,53 @@ export function UserDetailPage() {
           </CardContent>
         )}
       </Card>
+
+      <ScopeAssignmentDialog
+        user={user}
+        open={scopeDialogOpen}
+        onOpenChange={setScopeDialogOpen}
+      />
+    </div>
+  )
+}
+
+function ScopeAssignmentRow({
+  label,
+  relation,
+  source,
+}: {
+  label: string
+  relation: { code: string; name?: string } | null
+  source: string
+}) {
+  const display = relation
+    ? relation.name
+      ? `${relation.code} — ${relation.name}`
+      : relation.code
+    : '—'
+  const isManual = source === 'manual'
+  return (
+    <div className="rounded-md border bg-muted/30 p-3">
+      <div className="mb-1 flex items-center justify-between">
+        <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground/60">
+          {label}
+        </p>
+        <Badge
+          variant="outline"
+          className={
+            isManual
+              ? 'border-amber-500/50 text-amber-600 text-[10px] uppercase'
+              : 'text-[10px] uppercase'
+          }
+        >
+          {source}
+        </Badge>
+      </div>
+      <p
+        className={`text-sm ${relation ? 'font-medium' : 'text-muted-foreground'}`}
+      >
+        {display}
+      </p>
     </div>
   )
 }
