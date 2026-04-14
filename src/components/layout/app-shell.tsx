@@ -6,6 +6,7 @@ import {
   RefreshCw,
   Settings,
   Shield,
+  UserPlus,
   Users,
   Wrench,
 } from 'lucide-react'
@@ -41,6 +42,7 @@ import { useSidebarStore } from '@/stores/sidebar-store'
 const navItems = [
   { to: '/sync', label: 'Moodle Sync', icon: RefreshCw },
   { to: '/moodle-provision', label: 'Moodle Provision', icon: Wrench },
+  { to: '/provision-users', label: 'Provision User', icon: UserPlus },
   { to: '/users', label: 'Users', icon: Users },
   { to: '/submission-generator', label: 'Submission Generator', icon: FlaskConical },
   { to: '/audit-logs', label: 'Audit Logs', icon: FileText },

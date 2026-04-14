@@ -100,6 +100,7 @@ export const UserRole = {
   ADMIN: 'ADMIN',
   DEAN: 'DEAN',
   CHAIRPERSON: 'CHAIRPERSON',
+  CAMPUS_HEAD: 'CAMPUS_HEAD',
   FACULTY: 'FACULTY',
   STUDENT: 'STUDENT',
 } as const
@@ -210,7 +211,10 @@ export interface ProgramFilterOption extends FilterOption {
   moodleCategoryId: number
 }
 
-export type InstitutionalRole = typeof UserRole.DEAN | typeof UserRole.CHAIRPERSON
+export type InstitutionalRole =
+  | typeof UserRole.DEAN
+  | typeof UserRole.CHAIRPERSON
+  | typeof UserRole.CAMPUS_HEAD
 
 export interface AssignInstitutionalRoleRequest {
   userId: string
@@ -227,6 +231,32 @@ export interface RemoveInstitutionalRoleRequest {
 export interface DeanEligibleCategory {
   moodleCategoryId: number
   name: string
+}
+
+export interface CampusHeadEligibleCategory {
+  id: string
+  moodleCategoryId: number
+  name: string
+  depth: 1
+}
+
+export interface ProvisionUserRequest {
+  username: string
+  firstName: string
+  lastName: string
+  password?: string
+  campusId?: string
+}
+
+export interface ProvisionUserResponse {
+  id: string
+  username: string
+  firstName: string
+  lastName: string
+  fullName: string
+  campus: { id: string; code: string } | null
+  defaultPasswordAssigned: boolean
+  createdAt: string
 }
 
 // ── Health ──

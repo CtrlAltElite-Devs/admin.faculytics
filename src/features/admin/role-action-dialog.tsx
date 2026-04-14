@@ -31,13 +31,18 @@ import {
 import { Separator } from '@/components/ui/separator'
 import {
   useAssignRole,
+  useCampusHeadEligibleCategories,
   useDeanEligibleCategories,
   useRemoveRole,
 } from './use-institutional-roles'
 import { UserRole } from '@/types/api'
 import type { AdminUserItem, InstitutionalRole } from '@/types/api'
 
-const INSTITUTIONAL_ROLES: InstitutionalRole[] = [UserRole.DEAN, UserRole.CHAIRPERSON]
+const INSTITUTIONAL_ROLES: InstitutionalRole[] = [
+  UserRole.DEAN,
+  UserRole.CHAIRPERSON,
+  UserRole.CAMPUS_HEAD,
+]
 
 interface RoleActionDialogProps {
   user: AdminUserItem | null
@@ -53,6 +58,7 @@ export function RoleActionDialog({
   const assignRole = useAssignRole()
   const removeRole = useRemoveRole()
   const deanCategories = useDeanEligibleCategories(user?.id)
+  const campusHeadCategories = useCampusHeadEligibleCategories(user?.id)
 
   // Assign form state
   const [assignRoleValue, setAssignRoleValue] = useState<InstitutionalRole>(UserRole.DEAN)
@@ -185,7 +191,11 @@ export function RoleActionDialog({
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">
-                    {assignRoleValue === UserRole.DEAN ? 'Department' : 'Moodle Category ID'}
+                    {assignRoleValue === UserRole.DEAN
+                      ? 'Department'
+                      : assignRoleValue === UserRole.CAMPUS_HEAD
+                        ? 'Campus'
+                        : 'Moodle Category ID'}
                   </Label>
                   {assignRoleValue === UserRole.DEAN ? (
                     <Select
@@ -203,6 +213,31 @@ export function RoleActionDialog({
                       </SelectTrigger>
                       <SelectContent>
                         {(deanCategories.data ?? []).map((cat) => (
+                          <SelectItem
+                            key={cat.moodleCategoryId}
+                            value={String(cat.moodleCategoryId)}
+                          >
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : assignRoleValue === UserRole.CAMPUS_HEAD ? (
+                    <Select
+                      value={assignCategoryId}
+                      onValueChange={setAssignCategoryId}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={
+                          campusHeadCategories.isLoading
+                            ? 'Loading...'
+                            : campusHeadCategories.data?.length === 0
+                              ? 'No eligible campuses'
+                              : 'Select campus'
+                        } />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(campusHeadCategories.data ?? []).map((cat) => (
                           <SelectItem
                             key={cat.moodleCategoryId}
                             value={String(cat.moodleCategoryId)}
@@ -241,6 +276,17 @@ export function RoleActionDialog({
                         </>
                       ) : null
                     })()}
+                    {assignRoleValue === UserRole.CAMPUS_HEAD && (() => {
+                      const selected = campusHeadCategories.data?.find(
+                        (c) => String(c.moodleCategoryId) === assignCategoryId,
+                      )
+                      return selected ? (
+                        <>
+                          <span className="text-muted-foreground">Campus</span>
+                          <span className="font-medium">{selected.name}</span>
+                        </>
+                      ) : null
+                    })()}
                     {assignRoleValue === UserRole.CHAIRPERSON && (
                       <>
                         <span className="text-muted-foreground">Category ID</span>
@@ -271,7 +317,10 @@ export function RoleActionDialog({
                 disabled={
                   !assignCategoryId ||
                   assignRole.isPending ||
-                  (assignRoleValue === UserRole.DEAN && deanCategories.isLoading)
+                  (assignRoleValue === UserRole.DEAN &&
+                    deanCategories.isLoading) ||
+                  (assignRoleValue === UserRole.CAMPUS_HEAD &&
+                    campusHeadCategories.isLoading)
                 }
                 className="w-full gap-1.5"
                 size="sm"

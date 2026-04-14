@@ -5,6 +5,7 @@ import { useEnvStore } from '@/stores/env-store'
 import { useAuthStore } from '@/stores/auth-store'
 import type {
   AssignInstitutionalRoleRequest,
+  CampusHeadEligibleCategory,
   DeanEligibleCategory,
   RemoveInstitutionalRoleRequest,
 } from '@/types/api'
@@ -20,6 +21,23 @@ export function useDeanEligibleCategories(userId: string | undefined) {
     queryFn: () =>
       apiClient<DeanEligibleCategory[]>(
         `/admin/institutional-roles/dean-eligible-categories?userId=${userId}`,
+      ),
+    enabled: !!activeEnvId && isAuth && !!userId,
+    staleTime: 30_000,
+  })
+}
+
+export function useCampusHeadEligibleCategories(userId: string | undefined) {
+  const activeEnvId = useEnvStore((s) => s.activeEnvId)
+  const isAuth = useAuthStore((s) =>
+    activeEnvId ? s.isAuthenticated(activeEnvId) : false,
+  )
+
+  return useQuery<CampusHeadEligibleCategory[]>({
+    queryKey: ['campus-head-eligible-categories', activeEnvId, userId],
+    queryFn: () =>
+      apiClient<CampusHeadEligibleCategory[]>(
+        `/admin/institutional-roles/campus-head-eligible-categories?userId=${userId}`,
       ),
     enabled: !!activeEnvId && isAuth && !!userId,
     staleTime: 30_000,
