@@ -5,6 +5,7 @@ import { LoginPage } from '@/features/auth/login-page'
 import { SyncDashboard } from '@/features/moodle-sync/sync-dashboard'
 import { UserDetailPage } from '@/features/admin/user-detail-page'
 import { UsersPage } from '@/features/admin/users-page'
+import { UsersWithoutSubmissionsPage } from '@/features/users-without-submissions/users-without-submissions-page'
 import { GeneratorPage } from '@/features/submission-generator/generator-page'
 import { ProvisionPage } from '@/features/moodle-provision/provision-page'
 import { ProvisionUserPage } from '@/features/user-provisioning/provision-user-page'
@@ -27,6 +28,10 @@ export const routes: RouteObject[] = [
         children: [
           { path: '/sync', element: <SyncDashboard /> },
           { path: '/users', element: <UsersPage /> },
+          {
+            path: '/users-without-submissions',
+            element: <UsersWithoutSubmissionsPage />,
+          },
           { path: '/users/:userId', element: <UserDetailPage /> },
           { path: '/provision-users', element: <ProvisionUserPage /> },
           { path: '/submission-generator', element: <GeneratorPage /> },
