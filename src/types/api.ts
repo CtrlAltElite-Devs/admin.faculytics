@@ -141,6 +141,41 @@ export interface ListUsersQuery {
   limit?: number
 }
 
+export interface AdminNonSubmitterItem {
+  id: string
+  userName: string
+  fullName: string
+  moodleUserId?: number
+  roles: UserRole[]
+  isActive: boolean
+  enrolledCoursesInSemester: number
+  campus: AdminUserScopedRelation | null
+  department: AdminUserScopedRelation | null
+  program: AdminUserScopedRelation | null
+}
+
+export interface AdminNonSubmitterScope {
+  semesterId: string
+  semesterCode: string
+  semesterLabel?: string
+  academicYear?: string
+}
+
+export interface AdminNonSubmitterListResponse {
+  data: AdminNonSubmitterItem[]
+  meta: PaginationMeta
+  scope: AdminNonSubmitterScope
+}
+
+export interface ListNonSubmittersQuery {
+  search?: string
+  semesterId?: string
+  facultyUsername?: string
+  courseId?: string
+  page?: number
+  limit?: number
+}
+
 export interface AdminEnrollmentCourse {
   id: string
   shortname: string

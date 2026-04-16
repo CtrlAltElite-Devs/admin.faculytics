@@ -8,6 +8,7 @@ import {
   Shield,
   UserPlus,
   Users,
+  UserX,
   Wrench,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -44,6 +45,11 @@ const navItems = [
   { to: '/moodle-provision', label: 'Moodle Provision', icon: Wrench },
   { to: '/provision-users', label: 'Provision User', icon: UserPlus },
   { to: '/users', label: 'Users', icon: Users },
+  {
+    to: '/users-without-submissions',
+    label: 'Non-Submitters',
+    icon: UserX,
+  },
   { to: '/submission-generator', label: 'Submission Generator', icon: FlaskConical },
   { to: '/audit-logs', label: 'Audit Logs', icon: FileText },
 ]
