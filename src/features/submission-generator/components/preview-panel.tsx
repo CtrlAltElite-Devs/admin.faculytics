@@ -129,6 +129,14 @@ export function PreviewPanel({
             <Badge className="bg-brand-blue/10 text-xs text-brand-blue hover:bg-brand-blue/10">
               {metadata.generatingCount} generating
             </Badge>
+            {metadata.generatingCount < metadata.availableStudents && (
+              <Badge
+                variant="outline"
+                className="border-brand-blue/30 text-xs text-brand-blue"
+              >
+                Sampled {metadata.generatingCount} of {metadata.availableStudents}
+              </Badge>
+            )}
             <span className="ml-auto text-xs text-muted-foreground">
               {rows.length} row{rows.length !== 1 ? 's' : ''} in preview
             </span>
