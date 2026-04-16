@@ -347,6 +347,8 @@ export interface GeneratePreviewRequest {
   versionId: string
   facultyUsername: string
   courseShortname: string
+  count?: number
+  promptTheme?: string
 }
 
 export interface GeneratedRow {
