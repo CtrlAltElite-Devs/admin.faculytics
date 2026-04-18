@@ -16,6 +16,7 @@ import { useEnvStore } from '@/stores/env-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { ENV_COLORS } from '@/lib/constants'
 import type { Environment } from '@/types/api'
+import { SentimentConfigCard } from '@/features/sentiment-config/sentiment-config-card'
 
 interface EnvFormData {
   label: string
@@ -177,6 +178,8 @@ export function SettingsPage() {
           )}
         </CardContent>
       </Card>
+
+      <SentimentConfigCard />
     </div>
   )
 }
