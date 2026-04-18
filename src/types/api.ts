@@ -620,3 +620,17 @@ export interface MoodleCategoryCoursesResponse {
   categoryId: number
   courses: MoodleCoursePreview[]
 }
+
+// ── Sentiment vLLM Config ──
+
+export interface SentimentVllmConfigResponse {
+  url: string
+  model: string
+  enabled: boolean
+}
+
+export interface UpdateSentimentVllmConfigRequest {
+  url?: string
+  model?: string
+  enabled?: boolean
+}
