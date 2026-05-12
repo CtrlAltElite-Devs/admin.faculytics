@@ -586,6 +586,60 @@ export interface ListAuditLogsQuery {
   limit?: number
 }
 
+// ── Error Logs ──
+
+export interface ErrorLogItem {
+  id: string
+  statusCode: number
+  method: string
+  path: string
+  userId?: string
+  userName?: string
+  errorName: string
+  message: string
+  acknowledgedAt?: string
+  occurredAt: string
+}
+
+export interface ErrorLogDetail {
+  id: string
+  statusCode: number
+  method: string
+  path: string
+  userId?: string
+  userName?: string
+  errorName: string
+  message: string
+  stack?: string
+  requestBody?: Record<string, unknown>
+  requestQuery?: Record<string, unknown>
+  browserName?: string
+  os?: string
+  ipAddress?: string
+  acknowledgedAt?: string
+  acknowledgedBy?: string
+  occurredAt: string
+}
+
+export interface ErrorLogListResponse {
+  data: ErrorLogItem[]
+  meta: PaginationMeta
+}
+
+export interface ListErrorLogsQuery {
+  statusCode?: number
+  method?: string
+  pathSearch?: string
+  errorName?: string
+  userName?: string
+  acknowledged?: boolean
+  from?: string
+  to?: string
+  search?: string
+  page?: number
+  limit?: number
+}
+
 // ── Moodle Tree Explorer ──
 
 export interface MoodleCategoryTreeNode {

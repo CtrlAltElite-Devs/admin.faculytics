@@ -11,6 +11,7 @@ import { ProvisionPage } from '@/features/moodle-provision/provision-page'
 import { ProvisionUserPage } from '@/features/user-provisioning/provision-user-page'
 import { SettingsPage } from '@/features/settings/settings-page'
 import { AuditLogsPage } from '@/features/audit-logs/audit-logs-page'
+import { ErrorLogsPage } from '@/features/error-logs/error-logs-page'
 
 export const routes: RouteObject[] = [
   // Login — standalone, no shell
@@ -37,6 +38,7 @@ export const routes: RouteObject[] = [
           { path: '/submission-generator', element: <GeneratorPage /> },
           { path: '/moodle-provision', element: <ProvisionPage /> },
           { path: '/audit-logs', element: <AuditLogsPage /> },
+          { path: '/error-logs', element: <ErrorLogsPage /> },
           { path: '/', element: <Navigate to="/sync" replace /> },
         ],
       },
