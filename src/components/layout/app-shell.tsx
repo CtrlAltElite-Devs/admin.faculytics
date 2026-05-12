@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router'
 import {
+  AlertOctagon,
   FileText,
   FlaskConical,
   LogOut,
@@ -52,6 +53,7 @@ const navItems = [
   },
   { to: '/submission-generator', label: 'Submission Generator', icon: FlaskConical },
   { to: '/audit-logs', label: 'Audit Logs', icon: FileText },
+  { to: '/error-logs', label: 'Error Logs', icon: AlertOctagon },
 ]
 
 export function AppShell() {
