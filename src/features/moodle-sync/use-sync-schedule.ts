@@ -41,3 +41,27 @@ export function useUpdateSyncSchedule() {
     },
   })
 }
+
+export function useToggleSyncSchedule() {
+  const queryClient = useQueryClient()
+  const activeEnvId = useEnvStore((s) => s.activeEnvId)
+
+  return useMutation({
+    mutationFn: (enabled: boolean) =>
+      apiClient<SyncScheduleResponse>('/moodle/sync/schedule', {
+        method: 'PUT',
+        body: JSON.stringify({ enabled }),
+      }),
+    onSuccess: (data) => {
+      toast.success(
+        data.enabled ? 'Sync schedule enabled' : 'Sync schedule disabled',
+      )
+      queryClient.invalidateQueries({
+        queryKey: ['sync-schedule', activeEnvId],
+      })
+    },
+    onError: () => {
+      toast.error('Failed to toggle sync schedule')
+    },
+  })
+}

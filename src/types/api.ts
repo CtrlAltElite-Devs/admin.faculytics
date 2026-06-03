@@ -55,6 +55,7 @@ export interface SyncScheduleResponse {
   intervalMinutes: number
   cronExpression: string
   nextExecution: string | null
+  enabled: boolean
 }
 
 export interface TriggerSyncResponse {
@@ -62,7 +63,8 @@ export interface TriggerSyncResponse {
 }
 
 export interface UpdateSyncScheduleRequest {
-  intervalMinutes: number
+  intervalMinutes?: number
+  enabled?: boolean
 }
 
 // ── Auth ──
