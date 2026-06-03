@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Clock, Loader2, Pencil, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { Switch } from '@/components/ui/switch'
 import {
   Dialog,
   DialogContent,
@@ -18,12 +19,17 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { RelativeTime } from '@/components/shared/relative-time'
-import { useSyncSchedule, useUpdateSyncSchedule } from './use-sync-schedule'
+import {
+  useSyncSchedule,
+  useUpdateSyncSchedule,
+  useToggleSyncSchedule,
+} from './use-sync-schedule'
 import { MOODLE_SYNC_MIN_INTERVAL_MINUTES } from '@/lib/constants'
 
 export function SyncScheduleCard() {
   const { data, isLoading, isError } = useSyncSchedule()
   const updateSchedule = useUpdateSyncSchedule()
+  const toggleSchedule = useToggleSyncSchedule()
   const [open, setOpen] = useState(false)
   const [interval, setInterval] = useState('')
 
@@ -62,11 +68,22 @@ export function SyncScheduleCard() {
 
         {data && (
           <>
-            {/* Interval + cron */}
-            <div className="flex items-baseline justify-between">
-              <span className="text-sm font-semibold tabular-nums">
-                Every {data.intervalMinutes} min
-              </span>
+            {/* Toggle + Interval + cron */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Switch
+                  id="sync-schedule-toggle"
+                  checked={data.enabled}
+                  onCheckedChange={(checked) => toggleSchedule.mutate(checked)}
+                  disabled={toggleSchedule.isPending}
+                />
+                <label
+                  htmlFor="sync-schedule-toggle"
+                  className="text-sm font-semibold tabular-nums cursor-pointer"
+                >
+                  Every {data.intervalMinutes} min
+                </label>
+              </div>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <code className="text-[11px] font-mono text-muted-foreground/40 cursor-default">
@@ -84,15 +101,19 @@ export function SyncScheduleCard() {
                   <div className="flex items-center gap-1.5 text-sm">
                     <Clock className="size-3.5 text-brand-blue" />
                     <span className="font-medium">
-                      {data.nextExecution ? (
+                      {data.enabled && data.nextExecution ? (
                         <RelativeTime date={data.nextExecution} />
                       ) : (
-                        <span className="text-muted-foreground">—</span>
+                        <span className="text-muted-foreground">
+                          {data.enabled ? '—' : 'Disabled'}
+                        </span>
                       )}
                     </span>
                   </div>
                 </TooltipTrigger>
-                <TooltipContent>Next scheduled run</TooltipContent>
+                <TooltipContent>
+                  {data.enabled ? 'Next scheduled run' : 'Cron job is disabled'}
+                </TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
